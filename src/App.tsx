@@ -1,7 +1,9 @@
-import PageBrowser from './Page'
+
 import {Navigate, Route, Routes} from "react-router";
 import {BrowserRouter} from "react-router-dom";
-import {Character} from "./Character";
+
+import {Character} from "./components/Character";
+import {PageBrowser} from "./components/PageBrowser";
 
 function App() {
   return (

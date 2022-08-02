@@ -1,24 +1,15 @@
 import React, {useEffect, useState} from 'react'
-import axios from 'axios'
-import {Grid, Pagination} from "@mui/material";
 import {useSearchParams} from "react-router-dom";
-import {CharacterInfo, SimpleCharacter} from "./Character";
 
-interface PageInfo{
-    count: number;
-    pages: number;
-    next: string;
-    prev: string;
-}
+import {Grid, Pagination} from "@mui/material";
 
-interface Page{
-    info: PageInfo;
-    results: CharacterInfo[];
-}
+import {getPage} from "../util/apiInterface";
+import {SimpleCharacter} from "./SimpleCharacter";
+import {CharacterInfo} from "../types/CharacterInfo";
+import {emptyPage} from "../mockups/pageMockup";
+import {Page} from "../types/Page";
 
-const emptyPage: Page = {info:{count: 0, pages: 0, next: "", prev: ""}, results:[]};
-
-const PageBrowser: React.FC = () => {
+export const PageBrowser:React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     let currPageNo: number = Number.parseInt(searchParams.get("page") ?? "1");
 
@@ -26,12 +17,7 @@ const PageBrowser: React.FC = () => {
     const [currPage, setCurrPage] = useState(emptyPage);
 
     useEffect(() => {
-        axios.get(`https://rickandmortyapi.com/api/character/?page=${currPageNo}&name=${q}`)
-            .then(res => {
-                setCurrPage(res.data as Page);
-            }).catch(() => {
-            setCurrPage(emptyPage);
-            });
+        getPage(currPageNo, q).then(res => {setCurrPage(res.data as Page);}).catch(() => {setCurrPage(emptyPage);});
     }, [currPageNo, searchParams, q])
 
     return (
@@ -44,7 +30,7 @@ const PageBrowser: React.FC = () => {
                         setQ(e.target.value);
                     }}/>
                 </Grid>
-                {currPage.results.map((c) => {
+                {currPage.results.map((c: CharacterInfo) => {
                     return (
                         <Grid key={"character-".concat(c.id.toString())} item xs={12} sm={6} md={6} lg={4} xl={3}>
                             <SimpleCharacter char={c}/>
@@ -60,4 +46,3 @@ const PageBrowser: React.FC = () => {
         </div>
     );
 }
-export default PageBrowser;

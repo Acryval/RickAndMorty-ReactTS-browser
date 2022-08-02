@@ -1,77 +1,24 @@
-import {Button, Grid, Link} from "@mui/material";
+
+import React, {useEffect, useState} from "react";
 import {useNavigate} from "react-router";
 import {useSearchParams} from "react-router-dom";
-import React, {useEffect, useState} from "react";
-import axios from "axios";
-import {Image} from "@mantine/core";
-import {Box} from "@mui/system";
 
-export interface CharacterInfo{
-    id: number;
-    name: string;
-    status: "Alive" | "Dead" | "unknown";
-    species: string;
-    type: string;
-    gender: "Female" | "Male" | "Genderless" | "unknown";
-    origin: {name: string, url: string};
-    location: {name: string, url: string};
-    image: string;
-    episode: string[];
-    url: string;
-    created: string;
-}
+import {Button, Grid, Link} from "@mui/material";
+import {Image} from '@mantine/core'
 
-interface CharacterProps{
-    char: CharacterInfo;
-}
-
-export const SimpleCharacter:React.FC<CharacterProps> = (props) => {
-    return (
-        <Box sx={{
-            backgroundColor: '#87ff6b',
-            minHeight: 200,
-            border:1
-        }}>
-            <Link sx={{
-                textDecoration: "none",
-                color:'#222'
-            }} href={"/character/?id=" + props.char.id}>
-                <Box sx={{
-                    border:10,
-                    borderColor: '#87ff6b'
-                }}>
-                    <Image src={props.char.image}/>
-                </Box>
-                <Box>
-                    Name: {props.char.name}
-                    Status: {props.char.status}
-                </Box>
-            </Link>
-        </Box>
-    );
-}
+import {CharacterInfo} from "../types/CharacterInfo";
+import {emptyCharacter} from "../mockups/CharacterMockup";
+import {getCharacter} from "../util/apiInterface";
 
 export const Character:React.FC = () => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     let idValue: number = Number.parseInt(searchParams.get("id") ?? "1");
 
-    const [charInfo, setCharInfo] = useState({
-        id: 0,
-        name: "",
-        status: "unknown",
-        species: "",
-        type: "",
-        gender: "unknown",
-        origin: {name: "", url: ""},
-        location: {name: "", url: ""},
-        image: "",
-        episode: [],
-        url: "",
-        created: ""} as CharacterInfo);
+    const [charInfo, setCharInfo] = useState(emptyCharacter);
 
     useEffect(() => {
-        axios.get(`http://rickandmortyapi.com/api/character/${idValue}`)
+        getCharacter(idValue)
             .then(res => {
                 setCharInfo(res.data as CharacterInfo);
             });
