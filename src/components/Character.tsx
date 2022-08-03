@@ -110,13 +110,16 @@ export const Character:React.FC = () => {
                 <AccordionDetails>
                     {episodeList.map(S => {
                         return (
-                            <Accordion>
+                            <Accordion sx={{
+                                backgroundColor:'#222',
+                                color:'#fca',
+                            }}>
                                 <AccordionSummary>Season {S.season}</AccordionSummary>
                                 <AccordionDetails>
                                     {S.episodes.map(e => {
                                         return (
                                             <Grid key={"episode-link-" + e.id} item xs={3} md={2} lg={1}>
-                                                <Link href={e.url}>Episode {e.id}</Link>
+                                                <Link sx={{textDecoration: 'none', color:'#ceab95'}} href={e.url}>Episode {e.id}</Link>
                                             </Grid>);
                                     })}
                                 </AccordionDetails>
