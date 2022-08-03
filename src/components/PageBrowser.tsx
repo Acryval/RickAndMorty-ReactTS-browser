@@ -1,14 +1,13 @@
 import React, {useEffect, useState} from 'react'
 import {useSearchParams} from "react-router-dom";
 
-import {Grid, Pagination} from "@mui/material";
+import {Box, debounce, Grid, Pagination} from "@mui/material";
 
-import {getPage} from "../util/apiInterface";
 import {SimpleCharacter} from "./SimpleCharacter";
-import {CharacterInfo} from "../types/CharacterInfo";
+import {getPage} from "../util/apiInterface";
 import {emptyPage} from "../mockups/pageMockup";
 import {Page} from "../types/Page";
-import {Box} from "@mui/system";
+import {CharacterInfo} from "../types/CharacterInfo";
 
 export const PageBrowser:React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -18,7 +17,7 @@ export const PageBrowser:React.FC = () => {
     const [currPage, setCurrPage] = useState(emptyPage);
 
     useEffect(() => {
-        getPage(currPageNo, q).then(res => {setCurrPage(res.data as Page);}).catch(() => {setCurrPage(emptyPage);});
+        debounce(() => {getPage(currPageNo, q).then(res => {setCurrPage(res.data as Page);}).catch(() => {setCurrPage(emptyPage);});}, 500);
     }, [currPageNo, searchParams, q])
 
     return (
@@ -29,7 +28,7 @@ export const PageBrowser:React.FC = () => {
                 backgroundColor: '#97BC62',
                 color: '#fff',
             }}>
-                <Grid key={"search-box"} xs={12}sx={{
+                <Grid key={"search-box"} xs={12} sx={{
                     mt:3,
                 }}>
                     <Box sx={{

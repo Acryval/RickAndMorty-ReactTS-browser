@@ -3,13 +3,12 @@ import React, {useEffect, useState} from "react";
 import {useNavigate} from "react-router";
 import {useSearchParams} from "react-router-dom";
 
-import {Button, Grid, Link} from "@mui/material";
+import {Box, Button, Grid, Link} from "@mui/material";
 import {Image} from '@mantine/core'
 
 import {CharacterInfo} from "../types/CharacterInfo";
 import {emptyCharacter} from "../mockups/CharacterMockup";
 import {getCharacter} from "../util/apiInterface";
-import {Box} from "@mui/system";
 
 export const Character:React.FC = () => {
     const navigate = useNavigate();
