@@ -38,9 +38,9 @@ export const Character:React.FC = () => {
                 justifyContent: 'center',
             }}>
                 <Grid key={"image-" + idValue} item xs={12} sx={{
-                    ml:1,
-                    mr:3,
-                    mt:3,
+                    ml:7,
+                    mr:8,
+                    mt:2,
                 }}>
                     <Image src={charInfo.image}/>
                 </Grid>
