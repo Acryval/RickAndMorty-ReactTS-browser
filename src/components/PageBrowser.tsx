@@ -1,7 +1,7 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {useSearchParams} from "react-router-dom";
 
-import {Box, debounce, Grid, Pagination} from "@mui/material";
+import {Box, Grid, Pagination} from "@mui/material";
 
 import {SimpleCharacter} from "./SimpleCharacter";
 import {getPage} from "../util/apiInterface";
@@ -11,14 +11,30 @@ import {CharacterInfo} from "../types/CharacterInfo";
 
 export const PageBrowser:React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
-    let currPageNo: number = Number.parseInt(searchParams.get("page") ?? "1");
-
-    const [q, setQ] = useState("");
+    const [currPageNo, setCurrPageNo] = useState(Number.parseInt(searchParams.get("page") ?? "1"));
+    const [q, setQ] = useState(searchParams.get("search") ?? "");
     const [currPage, setCurrPage] = useState(emptyPage);
+    const [loading, setLoading] = useState(false);
+    const timeout = useRef<any>();
+
+    const fetchPage = (currPageNo:number, q:string) => {
+        setLoading(false);
+        clearTimeout(timeout.current);
+        timeout.current = setTimeout(async () => {
+            setLoading(true);
+            await getPage(currPageNo, q).then(res => {setCurrPage(res.data as Page);}).catch(() => {setCurrPage(emptyPage);});
+            setLoading(false);
+        }, 300);
+    }
 
     useEffect(() => {
-        debounce(() => {getPage(currPageNo, q).then(res => {setCurrPage(res.data as Page);}).catch(() => {setCurrPage(emptyPage);});}, 500);
-    }, [currPageNo, searchParams, q])
+        if(q !== ""){
+            setSearchParams({"page": currPageNo.toString(), "search":q});
+        }else{
+            setSearchParams({"page":currPageNo.toString()});
+        }
+        if(!loading) fetchPage(currPageNo, q);
+    }, [currPageNo, q])
 
     return (
         <Box sx={{
@@ -28,15 +44,16 @@ export const PageBrowser:React.FC = () => {
                 backgroundColor: '#97BC62',
                 color: '#fff',
             }}>
-                <Grid key={"search-box"} xs={12} sx={{
-                    mt:3,
-                }}>
+                <Grid key={"search-box"} item xs={12}>
                     <Box sx={{
                         textAlign:"right",
                         pr:1,
                         color:"#222",
                     }}>
                         Search: <input placeholder={"Rick.. or Morty"} type={"search"} value={q} onChange={(e) => {
+                            if(q !== e.target.value){
+                                setCurrPageNo(1);
+                            }
                             setQ(e.target.value);
                         }}/>
                     </Box>
@@ -53,9 +70,13 @@ export const PageBrowser:React.FC = () => {
                         </Grid>
                     );
                 })}
-                <Grid key={"paginator"} sx={{py:3}}>
-                    <Pagination count={currPage.info.pages} page={currPageNo} onChange={(e, v) => {
-                        setSearchParams({page: v.toString()});
+                <Grid key={"paginator"} item xs={12} sx={{py:3}}>
+                    <Pagination sx={{
+                        "& > *": {
+                            justifyContent:"center",
+                        }
+                    }} count={currPage.info.pages} page={currPageNo} onChange={(e, v) => {
+                        setCurrPageNo(v);
                     }}/>
                 </Grid>
             </Grid>
