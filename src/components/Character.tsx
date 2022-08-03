@@ -9,6 +9,7 @@ import {Image} from '@mantine/core'
 import {CharacterInfo} from "../types/CharacterInfo";
 import {emptyCharacter} from "../mockups/CharacterMockup";
 import {getCharacter} from "../util/apiInterface";
+import {Box} from "@mui/system";
 
 export const Character:React.FC = () => {
     const navigate = useNavigate();
@@ -20,46 +21,76 @@ export const Character:React.FC = () => {
     useEffect(() => {
         getCharacter(idValue)
             .then(res => {
-                setCharInfo(res.data as CharacterInfo);
+                let tempCharInfo: CharacterInfo = res.data;
+                if(tempCharInfo.type === ""){
+                    tempCharInfo.type = tempCharInfo.species;
+                }
+                setCharInfo(tempCharInfo);
             });
     }, [idValue]);
 
     return (
-    <Grid container spacing={2}>
-        <Grid item xs={12}>
-            <Image src={charInfo.image}/>
-        </Grid><Grid item xs={12}>
-            Id: {charInfo.id}
-        </Grid><Grid item xs={12}>
-            Name: {charInfo.name}
-        </Grid><Grid item xs={12}>
-            Status: {charInfo.status}
-        </Grid><Grid item xs={12}>
-            Species: {charInfo.species}
-        </Grid><Grid item xs={12}>
-            Type: {charInfo.type}
-        </Grid><Grid item xs={12}>
-            Gender: {charInfo.gender}
-        </Grid><Grid item xs={12}>
-            Origin: <Link href={charInfo.origin.url}>{charInfo.origin.name}</Link>
-        </Grid><Grid item xs={12}>
-            Location: <Link href={charInfo.location.url}>{charInfo.location.name}</Link>;
-        </Grid><Grid item xs={12}>
-            Created: {charInfo.created};
-        </Grid><Grid item xs={12}>
-            Episodes:
-            <Grid container spacing={1}>
-                {charInfo.episode.map((e) => {
-                    return (
-                        <Grid item xs={8}>
-                            <Link href={e}>{"Episode " + e.split("/").pop()}</Link>
-                        </Grid>);
-                })}
+        <Box sx={{
+            marginLeft:2,
+        }}>
+            <Grid container spacing={2} sx={{
+                backgroundColor: '#97BC62',
+                justifyContent: 'center',
+            }}>
+                <Grid key={"image-" + idValue} item xs={12} sx={{
+                    ml:1,
+                    mr:3,
+                    mt:3,
+                }}>
+                    <Image src={charInfo.image}/>
+                </Grid>
+                <Grid item xs={12} sx={{
+                    padding:2,
+                    border:16,
+                    borderColor:'#97BC62',
+                    backgroundColor:'#2C5F2D',
+                }}>
+                    <Grid key={"id-" + idValue} item xs={12}>
+                        Character Id: <b>{charInfo.id}</b>
+                    </Grid><Grid key={"name-" + idValue} item xs={12}>
+                        Name: <b>{charInfo.name}</b>
+                    </Grid><Grid key={"status-" + idValue} item xs={12}>
+                        Status: <b>{charInfo.status}</b>
+                    </Grid><Grid key={"species-" + idValue} item xs={12}>
+                        Species: <b>{charInfo.species}</b>
+                    </Grid><Grid key={"type-" + idValue} item xs={12}>
+                        Type: <b>{charInfo.type}</b>
+                    </Grid><Grid key={"gender-" + idValue} item xs={12}>
+                        Gender: <b>{charInfo.gender}</b>
+                    </Grid><Grid key={"origin-" + idValue} item xs={12}>
+                        Origin: <Link sx={{textDecoration: 'none', color:'#fca'}} href={charInfo.origin.url}><b>{charInfo.origin.name}</b></Link>
+                    </Grid><Grid key={"location-" + idValue} item xs={12}>
+                        Location: <Link sx={{textDecoration: 'none', color:'#fca'}} href={charInfo.location.url}><b>{charInfo.location.name}</b></Link>;
+                    </Grid><Grid key={"created-" + idValue} item xs={12}>
+                        Created: <b>{charInfo.created}</b>
+                    </Grid>
+                    <Grid key={"episodes-" + idValue} item xs={12}>
+                        Episodes:
+                        <Grid container spacing={1}>
+                            {charInfo.episode.map((e) => {
+                                let epno = e.split("/").pop();
+                                return (
+                                    <Grid key={"episode-" + epno} item xs={3} md={2} lg={1}>
+                                        <Link sx={{textDecoration: 'none', color:'#fca', pl:2}} href={e}><b>{"Episode " + epno}</b></Link>
+                                    </Grid>);
+                            })}
+                        </Grid>
+                    </Grid>
+                </Grid>
+                <Grid key={"navigator"} item>
+                    <Button sx={{
+                        backgroundColor:'#2C5F2D',
+                        textAlign:"center",
+                        mr:2,
+                    }} onClick={() => {
+                        navigate(-1);
+                    }}><b>Go Back</b></Button>
+                </Grid>
             </Grid>
-        </Grid><Grid item xs={12}>
-            <Button onClick={() => {
-                navigate(-1);
-            }}>Go Back</Button>
-        </Grid>
-    </Grid>);
+        </Box>);
 }
